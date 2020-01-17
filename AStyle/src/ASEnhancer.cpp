@@ -36,6 +36,7 @@ void ASEnhancer::init(int  _fileType,
                       bool _emptyLineFill,
                       vector<const pair<const string, const string>* >* _indentableMacros)
 {
+	MARK_ENTRY();
 	// formatting variables from ASFormatter and ASBeautifier
 	ASBase::init(_fileType);
 	indentLength = _indentLength;
@@ -73,6 +74,7 @@ void ASEnhancer::init(int  _fileType,
 	isInEventTable = false;
 	nextLineIsDeclareIndent = false;
 	isInDeclareSection = false;
+	MARK_EXIT();
 }
 
 /**
@@ -86,6 +88,7 @@ void ASEnhancer::init(int  _fileType,
  */
 void ASEnhancer::enhance(string& line, bool isInNamespace, bool isInPreprocessor, bool isInSQL)
 {
+	MARK_ENTRY();
 	shouldUnindentLine = true;
 	shouldUnindentComment = false;
 	lineNumber++;
@@ -143,6 +146,7 @@ void ASEnhancer::enhance(string& line, bool isInNamespace, bool isInPreprocessor
 		unindentLine(line, sw.unindentDepth - 1);
 	else if (shouldUnindentLine && sw.unindentDepth > 0)
 		unindentLine(line, sw.unindentDepth);
+	MARK_EXIT();
 }
 
 /**
@@ -152,6 +156,7 @@ void ASEnhancer::enhance(string& line, bool isInNamespace, bool isInPreprocessor
  */
 void ASEnhancer::convertForceTabIndentToSpaces(string& line) const
 {
+	MARK_ENTRY();
 	// replace tab indents with spaces
 	for (size_t i = 0; i < line.length(); i++)
 	{
@@ -164,6 +169,7 @@ void ASEnhancer::convertForceTabIndentToSpaces(string& line) const
 			i += tabLength - 1;
 		}
 	}
+	MARK_EXIT();
 }
 
 /**
@@ -173,12 +179,14 @@ void ASEnhancer::convertForceTabIndentToSpaces(string& line) const
  */
 void ASEnhancer::convertSpaceIndentToForceTab(string& line) const
 {
+	MARK_ENTRY();
 	assert(tabLength > 0);
 
 	// replace leading spaces with tab indents
 	size_t newSpaceIndentLength = line.find_first_not_of(" \t");
 	size_t tabCount = newSpaceIndentLength / tabLength;		// truncate extra spaces
 	line.replace(0U, tabCount * tabLength, tabCount, '\t');
+	MARK_EXIT();
 }
 
 /**
@@ -190,6 +198,7 @@ void ASEnhancer::convertSpaceIndentToForceTab(string& line) const
  */
 size_t ASEnhancer::findCaseColon(const string& line, size_t caseIndex) const
 {
+	MARK_ENTRY();
 	size_t i = caseIndex;
 	bool isInQuote_ = false;
 	char quoteChar_ = ' ';
@@ -225,7 +234,7 @@ size_t ASEnhancer::findCaseColon(const string& line, size_t caseIndex) const
 				break;                              // found it
 		}
 	}
-	return i;
+	RETURN(i);
 }
 
 /**
@@ -238,9 +247,10 @@ size_t ASEnhancer::findCaseColon(const string& line, size_t caseIndex) const
  */
 int ASEnhancer::indentLine(string& line, int indent) const
 {
+	MARK_ENTRY();
 	if (line.length() == 0
 	        && !emptyLineFill)
-		return 0;
+		RETURN(0);
 
 	size_t charsToInsert = 0;
 
@@ -265,7 +275,7 @@ int ASEnhancer::indentLine(string& line, int indent) const
 		line.insert(line.begin(), charsToInsert, ' ');
 	}
 
-	return charsToInsert;
+	RETURN(charsToInsert);
 }
 
 /**
@@ -278,6 +288,7 @@ int ASEnhancer::indentLine(string& line, int indent) const
  */
 bool ASEnhancer::isBeginDeclareSectionSQL(const string& line, size_t index) const
 {
+	MARK_ENTRY();
 	string word;
 	size_t hits = 0;
 	size_t i;
@@ -285,7 +296,7 @@ bool ASEnhancer::isBeginDeclareSectionSQL(const string& line, size_t index) cons
 	{
 		i = line.find_first_not_of(" \t", i);
 		if (i == string::npos)
-			return false;
+			RETURN(false);
 		if (line[i] == ';')
 			break;
 		if (!isCharPotentialHeader(line, i))
@@ -310,11 +321,11 @@ bool ASEnhancer::isBeginDeclareSectionSQL(const string& line, size_t index) cons
 			i += word.length() - 1;
 			continue;
 		}
-		return false;
+		RETURN(false);
 	}
 	if (hits == 3)
-		return true;
-	return false;
+		RETURN(true);
+	RETURN(false);
 }
 
 /**
@@ -327,6 +338,7 @@ bool ASEnhancer::isBeginDeclareSectionSQL(const string& line, size_t index) cons
  */
 bool ASEnhancer::isEndDeclareSectionSQL(const string& line, size_t index) const
 {
+	MARK_ENTRY();
 	string word;
 	size_t hits = 0;
 	size_t i;
@@ -334,7 +346,7 @@ bool ASEnhancer::isEndDeclareSectionSQL(const string& line, size_t index) const
 	{
 		i = line.find_first_not_of(" \t", i);
 		if (i == string::npos)
-			return false;
+			RETURN(false);
 		if (line[i] == ';')
 			break;
 		if (!isCharPotentialHeader(line, i))
@@ -359,11 +371,11 @@ bool ASEnhancer::isEndDeclareSectionSQL(const string& line, size_t index) const
 			i += word.length() - 1;
 			continue;
 		}
-		return false;
+		RETURN(false);
 	}
 	if (hits == 3)
-		return true;
-	return false;
+		RETURN(true);
+	RETURN(false);
 }
 
 /**
@@ -376,6 +388,7 @@ bool ASEnhancer::isEndDeclareSectionSQL(const string& line, size_t index) const
  */
 bool ASEnhancer::isOneLineBlockReached(const string& line, int startChar) const
 {
+	MARK_ENTRY();
 	assert(line[startChar] == '{');
 
 	bool isInComment_ = false;
@@ -436,10 +449,10 @@ bool ASEnhancer::isOneLineBlockReached(const string& line, int startChar) const
 			--_braceCount;
 
 		if (_braceCount == 0)
-			return true;
+			RETURN(true);
 	}
 
-	return false;
+	RETURN(false);
 }
 
 /**
@@ -448,6 +461,7 @@ bool ASEnhancer::isOneLineBlockReached(const string& line, int startChar) const
  */
 void ASEnhancer::parseCurrentLine(string& line, bool isInPreprocessor, bool isInSQL)
 {
+	MARK_ENTRY();
 	bool isSpecialChar = false;			// is a backslash escape character
 
 	for (size_t i = 0; i < line.length(); i++)
@@ -628,6 +642,7 @@ void ASEnhancer::parseCurrentLine(string& line, bool isInPreprocessor, bool isIn
 		i = processSwitchBlock(line, i);
 
 	}   // end of for loop * end of for loop * end of for loop * end of for loop
+	MARK_EXIT();
 }
 
 /**
@@ -639,6 +654,7 @@ void ASEnhancer::parseCurrentLine(string& line, bool isInPreprocessor, bool isIn
  */
 size_t ASEnhancer::processSwitchBlock(string& line, size_t index)
 {
+	MARK_ENTRY();
 	size_t i = index;
 	bool isPotentialKeyword = isCharPotentialHeader(line, i);
 
@@ -651,7 +667,7 @@ size_t ASEnhancer::processSwitchBlock(string& line, size_t index)
 			sw.unindentDepth++;
 			lookingForCaseBrace = false;              // not looking now
 		}
-		return i;
+		RETURN(i);
 	}
 	lookingForCaseBrace = false;                      // no opening brace, don't indent
 
@@ -674,7 +690,7 @@ size_t ASEnhancer::processSwitchBlock(string& line, size_t index)
 			sw = switchStack.back();
 			switchStack.pop_back();
 		}
-		return i;
+		RETURN(i);
 	}
 
 	if (isPotentialKeyword
@@ -703,19 +719,19 @@ size_t ASEnhancer::processSwitchBlock(string& line, size_t index)
 				sw.switchBraceCount++;
 				if (!isOneLineBlockReached(line, i))
 					unindentNextLine = true;
-				return i;
+				RETURN(i);
 			}
 		}
 		lookingForCaseBrace = true;
 		i--;									// need to process this char
-		return i;
+		RETURN(i);
 	}
 	if (isPotentialKeyword)
 	{
 		string name = getCurrentWord(line, i);          // bypass the entire name
 		i += name.length() - 1;
 	}
-	return i;
+	RETURN(i);
 }
 
 /**
@@ -728,13 +744,14 @@ size_t ASEnhancer::processSwitchBlock(string& line, size_t index)
  */
 int ASEnhancer::unindentLine(string& line, int unindent) const
 {
+	MARK_ENTRY();
 	size_t whitespace = line.find_first_not_of(" \t");
 
 	if (whitespace == string::npos)         // if line is blank
 		whitespace = line.length();         // must remove padding, if any
 
 	if (whitespace == 0)
-		return 0;
+		RETURN(0);
 
 	size_t charsToErase = 0;
 
@@ -769,7 +786,7 @@ int ASEnhancer::unindentLine(string& line, int unindent) const
 			charsToErase = 0;
 	}
 
-	return charsToErase;
+	RETURN(charsToErase);
 }
 
 }   // end namespace astyle

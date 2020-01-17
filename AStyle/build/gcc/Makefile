@@ -146,7 +146,7 @@ astyled: $(OBJd)
 	$(CXX) $(LDFLAGSd) -o $(bindir)/$@ $^
 	@ echo
 
-shared:  libastyle.so
+shared:  $(objdir) $(bindir) libastyle.so
 libastyle.so:  $(OBJs)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastyle.so.$(MAJORVER) \
 	-o $(bindir)/libastyle.so.$(SOLIBVER) $^
@@ -155,7 +155,7 @@ libastyle.so:  $(OBJs)
 	@mv  libastyle.so*  $(bindir)/
 	@ echo
 
-shareddebug:  libastyled.so
+shareddebug:  $(objdir) $(bindir) libastyled.so
 libastyled.so: $(OBJsd)
 	$(CXX) -shared $(LDFLAGSd) -Wl,-soname,libastyled.so.$(MAJORVER) \
 	-o $(bindir)/libastyled.so.$(SOLIBVER) $^
@@ -164,17 +164,17 @@ libastyled.so: $(OBJsd)
 	@mv  libastyled.so*  $(bindir)/
 	@ echo
 
-static:  libastyle.a
+static:  $(objdir) $(bindir) libastyle.a
 libastyle.a: $(OBJa)
 	ar crs $(bindir)/$@ $^
 	@ echo
 
-staticdebug:  libastyled.a
+staticdebug:  $(objdir) $(bindir) libastyled.a
 libastyled.a: $(OBJad)
 	ar crs $(bindir)/$@ $^
 	@ echo
 
-java:  libastylej.so
+java:  $(objdir) $(bindir) libastylej.so
 libastylej.so: $(OBJsj)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastylej.so.$(MAJORVER) \
 	-o $(bindir)/libastylej.so.$(SOLIBVER) $^
@@ -183,7 +183,7 @@ libastylej.so: $(OBJsj)
 	@mv  libastylej.so*  $(bindir)/
 	@ echo
 
-javadebug:  libastylejd.so
+javadebug:  $(objdir) $(bindir) libastylejd.so
 libastylejd.so: $(OBJsjd)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastylejd.so.$(MAJORVER) \
 	-o $(bindir)/libastylejd.so.$(SOLIBVER) $^
