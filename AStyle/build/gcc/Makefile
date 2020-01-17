@@ -1,4 +1,5 @@
 # Make file for GCC compiler on Linux or compatible OS
+D       =
 
 # list of source files for astyle
 SRC = astyle_main.cpp \
@@ -30,6 +31,10 @@ ifndef prefix
     prefix=/usr
 endif
 SYSCONF_PATH=$(prefix)/share/doc/astyle
+
+RM      = rm -f
+CP      = cp -p
+MKDIR   = mkdir -p
 
 # define macros
 # CXX defaults to g++
@@ -91,64 +96,58 @@ OBJsjd = $(patsubst %.cpp,$(objdir)/%_sjd.o,$(SRCx))
 
 # define object file rule (with the suffix) for each build
 
+default: $(objdir) $(bindir) $(OBJ)
+
 # OBJ
-$(objdir)/%.o:  %.cpp  astyle.h  astyle_main.h
-	@ mkdir -p $(objdir)
+$(objdir)/%.o:   %.cpp  astyle.h  astyle_main.h
 	$(CXX) $(CFLAGSr) -c $< -o $@
 
 # OBJd
-$(objdir)/%_d.o:  %.cpp  astyle.h  astyle_main.h
-	@ mkdir -p $(objdir)
-	$(CXX) $(CFLAGSd) -c $< -o $@
+$(objdir)/%_d.o:   %.cpp  astyle.h  astyle_main.h
+	$(CXX) $(CFLAGSd) -DDBG -c $< -o $@
 
 # OBJs
-$(objdir)/%_s.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
+$(objdir)/%_s.o:   %.cpp  astyle.h
 	$(CXX) $(CFLAGSs) -c $< -o $@
 
 # OBJsd
-$(objdir)/%_sd.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
-	$(CXX) $(CFLAGSsd) -c $< -o $@
+$(objdir)/%_sd.o:   %.cpp  astyle.h
+	$(CXX) $(CFLAGSsd) -DDBG -c $< -o $@
 
 # OBJa
-$(objdir)/%_a.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
+$(objdir)/%_a.o:   %.cpp  astyle.h
 	$(CXX) $(CFLAGSa) -c $< -o $@
 
 # OBJad
-$(objdir)/%_ad.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
-	$(CXX) $(CFLAGSad) -c $< -o $@
+$(objdir)/%_ad.o:   %.cpp  astyle.h
+	$(CXX) $(CFLAGSad) -DDBG -c $< -o $@
 
 # OBJsj
-$(objdir)/%_sj.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
+$(objdir)/%_sj.o:   %.cpp  astyle.h
 	$(CXX) $(CFLAGSsj) -c $< -o $@
 
 # OBJsjd
-$(objdir)/%_sjd.o:  %.cpp  astyle.h
-	@ mkdir -p $(objdir)
-	$(CXX) $(CFLAGSsjd) -c $< -o $@
+$(objdir)/%_sjd.o:   %.cpp  astyle.h
+	$(CXX) $(CFLAGSsjd) -DDBG -c $< -o $@
+
+$(objdir) $(bindir) $(ipath):
+	@$(MKDIR) $@
 
 ##################################################
 # define build dependencies for each command
 
-release:  astyle
-astyle:  $(OBJ)
-	@ mkdir -p $(bindir)
+release:  $(objdir) $(bindir) astyle
+astyle:   $(OBJ)
 	$(CXX) $(LDFLAGSr) -o $(bindir)/$@ $^
 	@ echo
 
-debug:  astyled
-astyled:  $(OBJd)
-	@ mkdir -p $(bindir)
+debug:  $(objdir) $(bindir) astyled
+astyled: $(OBJd)
 	$(CXX) $(LDFLAGSd) -o $(bindir)/$@ $^
 	@ echo
 
 shared:  libastyle.so
 libastyle.so:  $(OBJs)
-	@ mkdir -p $(bindir)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastyle.so.$(MAJORVER) \
 	-o $(bindir)/libastyle.so.$(SOLIBVER) $^
 	@ln  --symbolic --force  libastyle.so.$(SOLIBVER)  libastyle.so.$(MAJORVER)
@@ -157,8 +156,7 @@ libastyle.so:  $(OBJs)
 	@ echo
 
 shareddebug:  libastyled.so
-libastyled.so:  $(OBJsd)
-	@ mkdir -p $(bindir)
+libastyled.so: $(OBJsd)
 	$(CXX) -shared $(LDFLAGSd) -Wl,-soname,libastyled.so.$(MAJORVER) \
 	-o $(bindir)/libastyled.so.$(SOLIBVER) $^
 	@ln  --symbolic --force  libastyled.so.$(SOLIBVER)  libastyled.so.$(MAJORVER)
@@ -167,20 +165,17 @@ libastyled.so:  $(OBJsd)
 	@ echo
 
 static:  libastyle.a
-libastyle.a:  $(OBJa)
-	@ mkdir -p $(bindir)
+libastyle.a: $(OBJa)
 	ar crs $(bindir)/$@ $^
 	@ echo
 
 staticdebug:  libastyled.a
-libastyled.a:  $(OBJad)
-	@ mkdir -p $(bindir)
+libastyled.a: $(OBJad)
 	ar crs $(bindir)/$@ $^
 	@ echo
 
 java:  libastylej.so
-libastylej.so:  $(OBJsj)
-	@ mkdir -p $(bindir)
+libastylej.so: $(OBJsj)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastylej.so.$(MAJORVER) \
 	-o $(bindir)/libastylej.so.$(SOLIBVER) $^
 	@ln  --symbolic --force  libastylej.so.$(SOLIBVER)  libastylej.so.$(MAJORVER)
@@ -189,8 +184,7 @@ libastylej.so:  $(OBJsj)
 	@ echo
 
 javadebug:  libastylejd.so
-libastylejd.so:  $(OBJsjd)
-	@ mkdir -p $(bindir)
+libastylejd.so: $(OBJsjd)
 	$(CXX) -shared $(LDFLAGSr) -Wl,-soname,libastylejd.so.$(MAJORVER) \
 	-o $(bindir)/libastylejd.so.$(SOLIBVER) $^
 	@ln  --symbolic --force  libastylejd.so.$(SOLIBVER)  libastylejd.so.$(MAJORVER)
@@ -203,21 +197,21 @@ all:  release debug shared shareddebug static staticdebug
 javaall:  java javadebug
 
 clean:
-	rm -f $(objdir)/*.o $(bindir)/*astyle*
+	$(RM) $(objdir)/*.o $(bindir)/*astyle*
 
 cleanobj:
-	rm -f $(objdir)/*.o
+	$(RM) $(objdir)/*.o
 
-install:
+install: $(ipath)
 	$(INSTALL) -m 755 -d $(ipath)
-	@$(INSTALL) -m 755 $(bindir)/astyle  $(ipath)
+	@$(INSTALL) -m 755 $(bindir)/astyle$(D)  $(ipath)
 
 	@if [ -d $(SYSCONF_PATH)/html ]; then \
-		rm -rf  $(SYSCONF_PATH)/html; \
+		$(RM) -r $(SYSCONF_PATH)/html; \
 	fi
 
 	$(INSTALL) -m 755 -d $(SYSCONF_PATH)
-	@mkdir -p $(SYSCONF_PATH)/html;
+	@$(MKDIR) $(SYSCONF_PATH)/html;
 	@for files in astyle.html \
                   install.html \
                   news.html \
@@ -228,8 +222,8 @@ install:
 	done
 
 uninstall:
-	rm -f $(ipath)/astyle
-	rm -rf $(SYSCONF_PATH)
+	$(RM) $(ipath)/astyle$(D)
+	$(RM) -r $(SYSCONF_PATH)
 
 # copy release files to AStyleDev for testing
 # --force, --preserve, --no-dereference (retain links)

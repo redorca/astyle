@@ -17,6 +17,7 @@
 	#include <cassert>
 #endif
 
+#include "markdefs.h"
 #include <cctype>
 #include <iostream>		// for cout
 #include <memory>
