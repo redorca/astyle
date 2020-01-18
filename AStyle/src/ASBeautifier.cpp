@@ -1585,14 +1585,12 @@ void ASBeautifier::deleteBeautifierVectors()
 template<typename T>
 void ASBeautifier::deleteContainer(T& container)
 {
-	MARK_ENTRY();
 	if (container != nullptr)
 	{
 		container->clear();
 		delete (container);
 		container = nullptr;
 	}
-	MARK_EXIT();
 }
 
 /**

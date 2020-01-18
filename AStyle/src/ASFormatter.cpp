@@ -5656,14 +5656,12 @@ void ASFormatter::formatArrayRunIn()
  */
 void ASFormatter::deleteContainer(vector<BraceType>*& container)
 {
-	MARK_ENTRY();
 	if (container != nullptr)
 	{
 		container->clear();
 		delete (container);
 		container = nullptr;
 	}
-	MARK_EXIT();
 }
 
 /**
@@ -5674,14 +5672,12 @@ void ASFormatter::deleteContainer(vector<BraceType>*& container)
 template<typename T>
 void ASFormatter::deleteContainer(T& container)
 {
-	MARK_ENTRY();
 	if (container != nullptr)
 	{
 		container->clear();
 		delete (container);
 		container = nullptr;
 	}
-	MARK_EXIT();
 }
 
 /**
