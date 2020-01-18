@@ -111,7 +111,7 @@ void ASEnhancer::enhance(string& line, bool isInNamespace, bool isInPreprocessor
 	        && !isInEventTable
 	        && !isInDeclareSection
 	        && !emptyLineFill)
-		return;
+		RETURN();
 
 	// test for unindent on attached braces
 	if (unindentNextLine)
